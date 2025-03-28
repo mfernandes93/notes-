@@ -1,0 +1,23 @@
+SELECT 
+    r.ID_Responsavel,
+    r.NomeResponsavel,
+    r.FuncionalResponsavel,
+    r.FLG_AUTOPROC,
+    r.FLG_GESTOR,
+    r.AreaEmail,
+    r.EmailAccount AS EmailResponsavel,
+    r.Assinatura,
+    r.NameFile,
+    r.FolderName,
+    rc.ID_Celula,
+    c.NomeCelula,
+    c.NomeCelulaResumido,
+    c.CelulaAtiva,
+    c.Integradores,
+    c.EmailAccount AS EmailCelula,
+    c.Capacity
+FROM [DBT8400].[MOBIOS_CCRP].[tb_0100_Responsavel] AS r
+INNER JOIN [DBT8400].[MOBIOS_CCRP].[tb_0116_ResponsavelCelula] AS rc
+    ON r.ID_Responsavel = rc.ID_Responsavel
+INNER JOIN [DBT8400].[MOBIOS_CCRP].[tb_0113_Celula] AS c
+    ON rc.ID_Celula = c.ID_Celula;
