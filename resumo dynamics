@@ -1,0 +1,31 @@
+Recentemente, duas contas de e-mail foram migradas do ambiente Exchange para o Office 365 com o objetivo de habilitar o uso do Dynamics 365.
+
+Vantagens do Dynamics 365:
+
+Centralização do gerenciamento das solicitações;
+
+Automação no atendimento;
+
+Rastreabilidade completa das interações com clientes;
+
+Maior eficiência operacional.
+
+Consequências da migração:
+
+O sistema legado, que fazia leitura automática dos e-mails e download de anexos específicos para abertura de contas de contingência, iria perder sua funcionalidade se não fosse incrementada a compatibilidade com o Office 365. Caso houvesse atraso nessa adaptação, poderia impactar diretamente a implementação do Dynamics 365.
+
+Solução adotada:
+
+O sistema legado foi adaptado para utilizar a API Graph da Microsoft.
+
+Vantagens da API Graph:
+
+Maior segurança nas autenticações;
+
+Melhor desempenho e escalabilidade;
+
+Integração simplificada com serviços do Office 365;
+
+Acesso robusto e padronizado aos recursos de e-mails e anexos;
+
+Garantia de continuidade operacional e confiabilidade da solução implementada.
