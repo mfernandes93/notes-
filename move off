@@ -1,0 +1,41 @@
+using System;
+using System.Runtime.InteropServices;
+using System.Threading;
+
+class Program
+{
+    [DllImport("user32.dll")]
+    static extern bool SetCursorPos(int X, int Y);
+
+    [DllImport("user32.dll")]
+    static extern bool GetCursorPos(out POINT lpPoint);
+
+    struct POINT
+    {
+        public int X;
+        public int Y;
+    }
+
+    static void Main(string[] args)
+    {
+        Console.WriteLine("Mouse mover iniciado. Pressione Ctrl+C para sair.");
+
+        while (true)
+        {
+            MoveMouseSlightly();
+            Thread.Sleep(TimeSpan.FromMinutes(4)); // Move o mouse a cada 4 minutos
+        }
+    }
+
+    static void MoveMouseSlightly()
+    {
+        GetCursorPos(out POINT currentPos);
+
+        // Pequeno movimento: mexe o mouse em 1 pixel pra direita e volta
+        SetCursorPos(currentPos.X + 1, currentPos.Y);
+        Thread.Sleep(50);
+        SetCursorPos(currentPos.X, currentPos.Y);
+
+        Console.WriteLine($"Mouse movido em {DateTime.Now}");
+    }
+}
