@@ -1,0 +1,30 @@
+1. Câmbio – Correção de Direcionamento de Etapa
+Objetivo:
+Ajustar o fluxo da etapa de ativação de câmbio para que seja finalizado automaticamente, sem direcionamento indevido para a fila de cadastro de clientes.
+
+Descrição:
+Atualmente, a ativação de câmbio exige ação manual por parte da equipe, pois está sendo enviada erroneamente para a fila de cadastro de clientes. Essa tarefa visa corrigir esse comportamento, garantindo que a ativação ocorra de forma automática ao chegar nessa etapa do processo.
+
+Resultado Esperado:
+Redução de esforço operacional e maior fluidez no atendimento de câmbio.
+
+2. Agro – Inclusão de Cotitular sem Oneração
+Objetivo:
+Evitar que o processo de inclusão de cotitular no segmento Agro seja tratado como um novo cadastro de cliente.
+
+Descrição:
+Hoje, ao adicionar um cotitular em propostas do segmento Agro, o sistema encaminha o processo para a fila de cadastro de clientes, gerando retrabalho desnecessário. A proposta é alterar essa lógica para que a inclusão de cotitular seja tratada de forma específica, sem afetar o fluxo de cadastro.
+
+Resultado Esperado:
+Maior eficiência no processo de cotitularidade, com eliminação de tarefas manuais desnecessárias.
+
+3. Middle – Otimização da Renovação de Contratos
+Objetivo:
+Impedir que a etapa de renovação no segmento Middle Market entre no cadastro de clientes.
+
+Descrição:
+Por algum motivo inesperado, quando o crédito é negado, o produto do segmento Middle entra na etapa de cadastro de clientes. Esta tarefa visa impedir esse redirecionamento indevido, tratando a renovação de forma isolada do fluxo de cadastro.
+
+Resultado Esperado:
+Evitar encaminhamentos incorretos e eliminar carga manual desnecessária na fila de cadastro.
+
