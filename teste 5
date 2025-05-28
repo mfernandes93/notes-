@@ -1,0 +1,74 @@
+WITH Base AS (
+    SELECT
+        st.*,
+        obj.NomeObjeto,
+        obj.DescricaoObjeto,
+        obj.CategoriaObjeto,
+        et.NomeEtapa AS NomeEtapaAtual
+    FROM [DBTB400].[MOBIOS_CCRP].[tb_0119_StatusEtapas] st
+    LEFT JOIN [DBTB400].[MOBIOS_CCRP].[tb_0001_Objetos] obj ON st.ID_Objeto = obj.ID_Objeto
+    LEFT JOIN [DBTB400].[MOBIOS_CCRP].[tb_0008_Etapas] et ON st.ID_Etapa = et.ID_Etapa
+),
+Methodos AS (
+    SELECT ID_Method, MethodName FROM [DBTB400].[MOBIOS_CCRP].[tb_0400_Method]
+),
+Etapas AS (
+    SELECT ID_Etapa, NomeEtapa FROM [DBTB400].[MOBIOS_CCRP].[tb_0008_Etapas]
+),
+StatusDescricoes AS (
+    SELECT DISTINCT ID_Status, StatusDescricao FROM [DBTB400].[MOBIOS_CCRP].[tb_0119_StatusEtapas]
+)
+SELECT
+    b.ID_Objeto,
+    b.NomeObjeto,
+    b.DescricaoObjeto,
+    b.CategoriaObjeto,
+    b.ID_Etapa,
+    b.NomeEtapaAtual,
+    b.ID_Status,
+    b.StatusDescricao,
+    b.ValidaEtapaAlterar,
+    b.EtapasValidar,
+    b.ID_Etapa_Alterar,
+    b.ID_Status_Alterar,
+    b.CustomMethod,
+    b.ID_Method,
+    b.ConcluirServico,
+    b.CancelarServico,
+    b.ID_Method_DepoisdeSalvar,
+
+    -- Métodos formatados
+    (
+        SELECT STRING_AGG(CONCAT(LTRIM(RTRIM(value)), ' = ', m.MethodName), '; ')
+        FROM STRING_SPLIT(b.ID_Method, ';') s
+        JOIN Methodos m ON TRY_CAST(s.value AS INT) = m.ID_Method
+    ) AS ID_Method_Formatado,
+
+    (
+        SELECT STRING_AGG(CONCAT(LTRIM(RTRIM(value)), ' = ', m.MethodName), '; ')
+        FROM STRING_SPLIT(b.ID_Method_DepoisdeSalvar, ';') s
+        JOIN Methodos m ON TRY_CAST(s.value AS INT) = m.ID_Method
+    ) AS ID_Method_DepoisdeSalvar_Formatado,
+
+    -- EtapasValidar formatado
+    (
+        SELECT STRING_AGG(CONCAT(LTRIM(RTRIM(value)), ' = ', e.NomeEtapa), '; ')
+        FROM STRING_SPLIT(b.EtapasValidar, ';') s
+        JOIN Etapas e ON TRY_CAST(s.value AS INT) = e.ID_Etapa
+    ) AS EtapasValidar_Formatado,
+
+    -- ID_Etapa_Alterar formatado
+    (
+        SELECT STRING_AGG(CONCAT(LTRIM(RTRIM(value)), ' = ', e.NomeEtapa), '; ')
+        FROM STRING_SPLIT(b.ID_Etapa_Alterar, ';') s
+        JOIN Etapas e ON TRY_CAST(s.value AS INT) = e.ID_Etapa
+    ) AS ID_Etapa_Alterar_Formatado,
+
+    -- ID_Status_Alterar formatado
+    (
+        SELECT STRING_AGG(CONCAT(LTRIM(RTRIM(value)), ' = ', s.StatusDescricao), '; ')
+        FROM STRING_SPLIT(b.ID_Status_Alterar, ';') sp
+        JOIN StatusDescricoes s ON TRY_CAST(sp.value AS INT) = s.ID_Status
+    ) AS ID_Status_Alterar_Formatado
+
+FROM Base b
