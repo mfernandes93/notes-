@@ -1,0 +1,16 @@
+WITH ResultadoFinal AS (
+    -- aqui entra todo seu SELECT formatado
+)
+SELECT *
+FROM ResultadoFinal
+WHERE
+    CONCAT_WS('|',
+        ID_Objeto,
+        NomeObjeto,
+        NomeEtapaAtual,
+        ID_Method_Formatado,
+        EtapasValidar_Formatado,
+        ID_Etapa_Alterar_Formatado,
+        ID_Status_Alterar_Formatado
+        -- adicione aqui os campos do resultado que você quer incluir
+    ) LIKE '%teste%'
