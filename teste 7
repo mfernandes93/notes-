@@ -1,0 +1,93 @@
+WITH Base AS (
+    SELECT
+        st.*,
+        obj.NomeObjeto,
+        obj.DescricaoObjeto,
+        obj.CategoriaObjeto,
+        et.NomeEtapa AS NomeEtapaAtual
+    FROM [DBTB400].[MOBIOS_CCRP].[tb_0119_StatusEtapas] st
+    LEFT JOIN [DBTB400].[MOBIOS_CCRP].[tb_0001_Objetos] obj ON st.ID_Objeto = obj.ID_Objeto
+    LEFT JOIN [DBTB400].[MOBIOS_CCRP].[tb_0008_Etapas] et ON st.ID_Etapa = et.ID_Etapa
+),
+Methodos AS (
+    SELECT ID_Method, MethodName FROM [DBTB400].[MOBIOS_CCRP].[tb_0400_Method]
+),
+Etapas AS (
+    SELECT ID_Etapa, NomeEtapa FROM [DBTB400].[MOBIOS_CCRP].[tb_0008_Etapas]
+),
+StatusDescricoes AS (
+    SELECT DISTINCT ID_Status, StatusDescricao FROM [DBTB400].[MOBIOS_CCRP].[tb_0119_StatusEtapas]
+)
+SELECT
+    b.ID_Objeto,
+    b.NomeObjeto,
+    b.DescricaoObjeto,
+    b.CategoriaObjeto,
+    b.ID_Etapa,
+    b.NomeEtapaAtual,
+    b.ID_Status,
+    b.StatusDescricao,
+    b.ValidaEtapaAlterar,
+    b.EtapasValidar,
+    b.ID_Etapa_Alterar,
+    b.ID_Status_Alterar,
+    b.CustomMethod,
+    b.ID_Method,
+    b.ConcluirServico,
+    b.CancelarServico,
+    b.ID_Method_DepoisdeSalvar,
+
+    -- Métodos formatados
+    (
+        
+    (
+        SELECT STUFF((
+            SELECT '; ' + m.ID_Method + ' = ' + m.MethodName
+            FROM STRING_SPLIT(b.ID_Method, ';') AS s
+            JOIN Methodos AS M ON TRY_CAST(s.value AS INT) = m.ID_Method
+            FOR XML PATH(''), TYPE).value('.', 'NVARCHAR(MAX)'), 1, 2, '')
+    ) AS ID_Method_Formatado,
+
+    (
+        
+    (
+        SELECT STUFF((
+            SELECT '; ' + m.ID_Method + ' = ' + m.MethodName
+            FROM STRING_SPLIT(b.ID_Method_DepoisdeSalvar, ';') AS s
+            JOIN Methodos AS M ON TRY_CAST(s.value AS INT) = m.ID_Method
+            FOR XML PATH(''), TYPE).value('.', 'NVARCHAR(MAX)'), 1, 2, '')
+    ) AS ID_Method_DepoisdeSalvar_Formatado,
+
+    -- EtapasValidar formatado
+    (
+        
+    (
+        SELECT STUFF((
+            SELECT '; ' + e.ID_Etapa + ' = ' + e.NomeEtapa
+            FROM STRING_SPLIT(b.EtapasValidar, ';') AS s
+            JOIN Etapas AS E ON TRY_CAST(s.value AS INT) = e.ID_Etapa
+            FOR XML PATH(''), TYPE).value('.', 'NVARCHAR(MAX)'), 1, 2, '')
+    ) AS EtapasValidar_Formatado,
+
+    -- ID_Etapa_Alterar formatado
+    (
+        
+    (
+        SELECT STUFF((
+            SELECT '; ' + e.ID_Etapa + ' = ' + e.NomeEtapa
+            FROM STRING_SPLIT(b.ID_Etapa_Alterar, ';') AS s
+            JOIN Etapas AS E ON TRY_CAST(s.value AS INT) = e.ID_Etapa
+            FOR XML PATH(''), TYPE).value('.', 'NVARCHAR(MAX)'), 1, 2, '')
+    ) AS ID_Etapa_Alterar_Formatado,
+
+    -- ID_Status_Alterar formatado
+    (
+        
+    (
+        SELECT STUFF((
+            SELECT '; ' + s.ID_Status + ' = ' + s.StatusDescricao
+            FROM STRING_SPLIT(b.ID_Status_Alterar, ';') AS s
+            JOIN StatusDescricoes AS S ON TRY_CAST(s.value AS INT) = s.ID_Status
+            FOR XML PATH(''), TYPE).value('.', 'NVARCHAR(MAX)'), 1, 2, '')
+    ) AS ID_Status_Alterar_Formatado,
+FROM Base b
