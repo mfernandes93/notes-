@@ -1,0 +1,62 @@
+✅ Resumo Final da História de Kanban: Automatização da Conclusão da Ativação de Câmbio
+🧭 Visão do Usuário
+O usuário deseja que, após a ativação do câmbio ser acionada via Mobius, ela seja concluída automaticamente quando estiver na etapa ativação câmbio com status iniciar, sem necessidade de intervenção manual.
+
+📖 Narrativa de Negócio
+A etapa de ativação de câmbio atualmente exige acompanhamento ou ação manual em alguns cenários. Para simplificar o processo e garantir fluidez operacional, a proposta é que a conclusão dessa etapa ocorra automaticamente após ser acionada, desde que validada previamente no ambiente de desenvolvimento.
+
+📋 Regras de Negócio
+A ativação de câmbio será concluída automaticamente sempre que a etapa for ativação câmbio e o status for iniciar.
+
+Essa lógica será aplicada apenas quando acionada através do método acionar câmbio, utilizado no sistema Mobius.
+
+Não deve haver impacto colateral em outros fluxos relacionados a etapas ou status diferentes.
+
+✅ Critérios de Aceite
+A conclusão automática deve acontecer ao detectar etapa = ativação câmbio e status = iniciar.
+
+O comportamento deve ser idêntico ao processo manual, sem diferenças de lógica ou estado final.
+
+Nenhum erro ou interrupção deve ocorrer mesmo com múltiplas ativações simultâneas.
+
+🧪 Cenários de Testes
+Cenário 1 – Caminho Feliz:
+
+Acionar câmbio via método acionar câmbio.
+
+Confirmar que, ao atingir ativação câmbio com status = iniciar, a conclusão ocorre automaticamente.
+
+Cenário 2 – Etapa Diferente:
+
+Acionar câmbio em qualquer etapa que não seja ativação câmbio.
+
+Verificar que nenhuma ação automática de conclusão ocorre.
+
+Cenário 3 – Status Diferente:
+
+Etapa correta, mas status diferente de “iniciar”.
+
+Verificar que não há conclusão automática.
+
+Cenário 4 – Execução em Ambiente de Produção:
+
+Validar o comportamento real no ambiente de produção após deploy.
+
+Cenário 5 – Testes de carga:
+
+Executar múltiplas ativações em paralelo.
+
+Garantir que não ocorra race condition nem falhas de concorrência.
+
+🧑‍💻 Informações Técnicas
+A mudança será aplicada no método acionar câmbio do sistema Mobius.
+
+A lógica de verificação da etapa e status será implementada diretamente neste método.
+
+Será utilizado um validador interno no código para evitar que a conclusão automática ocorra em estados ou etapas indevidas.
+
+A mudança foi testada previamente no ambiente de desenvolvimento.
+
+O deploy será feito diretamente em produção, sem feature toggle, por se tratar de um ajuste considerado de baixo risco e já validado.
+
+Logs de auditoria serão mantidos para registrar toda conclusão automática.
