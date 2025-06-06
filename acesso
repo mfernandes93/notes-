@@ -1,0 +1,7 @@
+Justificativa para Acesso ao Banco de Dados
+
+O acesso ao banco de dados é utilizado exclusivamente para consultas, com o objetivo de verificar a fila dos robôs das automações do sistema Mobius. Esse acesso é essencial para monitorar e assegurar o bom funcionamento das automações, além de permitir a rápida identificação e resolução de eventuais problemas operacionais.
+
+Justificativa para Segundo Acesso ao Banco de Dados
+
+O segundo acesso ao banco de dados é necessário para controlar e auditar quem está manipulando os robôs via sistema Mobius. Esse acesso é fundamental para garantir a segurança e a conformidade das operações, permitindo um acompanhamento detalhado das atividades e garantindo a integridade do sistema.
