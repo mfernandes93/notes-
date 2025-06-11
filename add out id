@@ -1,0 +1,58 @@
+private List<Campos> RetornarListaCamposPersistirFromJson(FilaTransitoria servicoEnfileirado, List<IdCampoValor> ListaIdCampoValor)
+{
+    var listaCamposPreencher = new List<Campos>();
+
+    var listaCamposObjeto = DataAccess.BuscarCamposServicoCamposEtapas(Convert.ToInt32(servicoEnfileirado.ID_Objeto));
+
+    foreach (IdCampoValor item in ListaIdCampoValor)
+    {
+        int id_campo = 0;
+        if (int.TryParse(item.IdCampo, out id_campo))
+        {
+            // Laço normal
+            AdicionarCampo(id_campo);
+
+            // Duplicar se for o ID 4523
+            if (id_campo == 4523)
+            {
+                AdicionarCampo(8255);
+            }
+
+            void AdicionarCampo(int idParaUsar)
+            {
+                var campo = listaCamposObjeto.Find(c => c.ID_Campo == idParaUsar);
+                if (campo != null)
+                {
+                    string tipo = campo.CampoTipo.ToUpper();
+                    switch (tipo)
+                    {
+                        case "CHECKBOX":
+                            bool auxCheckBox = false;
+                            bool.TryParse(item.Valor, out auxCheckBox);
+                            campo.ValorCampoAntigo = string.Empty;
+                            campo.ValorCampo = auxCheckBox.ToString();
+                            break;
+
+                        case "TABELA":
+                            // Tratado em AtualizarCamposTabelasServico
+                            break;
+
+                        default:
+                            campo.ValorCampoAntigo = string.Empty;
+                            // campo.ValorCampoAntigo = DataAccess.BuscarValorCampo(idServico, campoDNA.ID_Campo).ToString();
+                            campo.ValorCampo = TelaDinamica.FormatarValorCampoParaGravarNaBancoDeDados(campo.CampoDominio, item.Valor, campo.CampoLabelU);
+                            break;
+                    }
+
+                    listaCamposPreencher.Add(campo);
+                }
+            }
+        }
+        else
+        {
+            Console.WriteLine(string.Format("O campo de ID {0} não foi encontrado.", item.IdCampo));
+        }
+    }
+
+    return listaCamposPreencher;
+}
