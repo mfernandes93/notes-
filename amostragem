@@ -1,9 +1,8 @@
-/* Inventário + Amostragem de CNPJ (todas as colunas suspeitas) */
-
+/* Inventário + Amostragem de CNPJ (com validação do formato novo) */
 SET NOCOUNT ON;
 
-IF OBJECT_ID('tempdb..#targets') IS NOT NULL DROP TABLE #targets;
-IF OBJECT_ID('tempdb..#summary') IS NOT NULL DROP TABLE #summary;
+IF OBJECT_ID('tempdb..#targets')  IS NOT NULL DROP TABLE #targets;
+IF OBJECT_ID('tempdb..#summary')  IS NOT NULL DROP TABLE #summary;
 IF OBJECT_ID('tempdb..#examples') IS NOT NULL DROP TABLE #examples;
 
 CREATE TABLE #targets (
@@ -14,36 +13,29 @@ CREATE TABLE #targets (
   MaxLen     int
 );
 
--- 1) Descobrir colunas suspeitas
 INSERT INTO #targets (SchemaName, TableName, ColumnName, DataType, MaxLen)
-SELECT
-  s.name,
-  t.name,
-  c.name,
-  ty.name,
-  c.max_length
+SELECT s.name, t.name, c.name, ty.name, c.max_length
 FROM sys.tables t
-JOIN sys.schemas s   ON s.schema_id = t.schema_id
-JOIN sys.columns c   ON c.object_id = t.object_id
-JOIN sys.types   ty  ON ty.user_type_id = c.user_type_id
-WHERE
-      c.name COLLATE SQL_Latin1_General_CP1_CI_AS LIKE '%cnpj%'
+JOIN sys.schemas s ON s.schema_id = t.schema_id
+JOIN sys.columns c ON c.object_id = t.object_id
+JOIN sys.types ty ON ty.user_type_id = c.user_type_id
+WHERE c.name COLLATE SQL_Latin1_General_CP1_CI_AS LIKE '%cnpj%'
    OR c.name COLLATE SQL_Latin1_General_CP1_CI_AS LIKE '%cgc%'
    OR c.name COLLATE SQL_Latin1_General_CP1_CI_AS LIKE '%cgccpf%'
    OR c.name COLLATE SQL_Latin1_General_CP1_CI_AS LIKE '%cpf_cnpj%'
    OR c.name COLLATE SQL_Latin1_General_CP1_CI_AS LIKE '%inscricaofederal%';
 
--- 2) Tabelas de saída
 CREATE TABLE #summary (
-  SchemaName sysname,
-  TableName  sysname,
-  ColumnName sysname,
-  DataType   sysname,
-  Total      bigint,
-  Distintos  bigint,
-  MinLen     int,
-  MaxLen     int,
-  QtdInvalidos bigint
+  SchemaName   sysname,
+  TableName    sysname,
+  ColumnName   sysname,
+  DataType     sysname,
+  Total        bigint,
+  Distintos    bigint,
+  MinLen       int,
+  MaxLen       int,
+  QtdInvalidos bigint,
+  QtdInvalidosFormatoNovo bigint
 );
 
 CREATE TABLE #examples (
@@ -55,7 +47,6 @@ CREATE TABLE #examples (
   Motivo     varchar(64)
 );
 
--- 3) Loop dinâmico por coluna alvo
 DECLARE @Schema sysname, @Table sysname, @Col sysname, @Type sysname, @sql nvarchar(max);
 
 DECLARE cur CURSOR FAST_FORWARD FOR
@@ -63,78 +54,70 @@ DECLARE cur CURSOR FAST_FORWARD FOR
   FROM #targets
   ORDER BY SchemaName, TableName, ColumnName;
 
-OPEN cur;
+OPEN cur; 
 FETCH NEXT FROM cur INTO @Schema, @Table, @Col, @Type;
 
 WHILE @@FETCH_STATUS = 0
 BEGIN
-  -- Expressão segura: converte qualquer tipo para texto sem erro
-  -- (TRY_CONVERT devolve NULL quando não der)
   SET @sql = N'
-  ;WITH src AS (
-    SELECT
-      v = TRY_CONVERT(nvarchar(256), ' + QUOTENAME(@Col) + N')
-    FROM ' + QUOTENAME(@Schema) + N'.' + QUOTENAME(@Table) + N'
-  ),
-  norm AS (
-    SELECT v,
-           LEN(v) AS L
-    FROM src
-  ),
-  inval AS (
-    SELECT *
-    FROM norm
-    WHERE v IS NULL
-       OR L <> 14
-       OR v COLLATE SQL_Latin1_General_CP1_CI_AS LIKE ''%[^0-9A-Z]%''
-  )
-  INSERT INTO #summary (SchemaName, TableName, ColumnName, DataType, Total, Distintos, MinLen, MaxLen, QtdInvalidos)
-  SELECT
-    ' + QUOTENAME(@Schema,'''') + N',
-    ' + QUOTENAME(@Table,'''')  + N',
-    ' + QUOTENAME(@Col,'''')    + N',
-    ' + QUOTENAME(@Type,'''')   + N',
-    (SELECT COUNT(*) FROM norm),
-    (SELECT COUNT(DISTINCT v) FROM norm),
-    (SELECT MIN(L) FROM norm),
-    (SELECT MAX(L) FROM norm),
-    (SELECT COUNT(*) FROM inval);
+  DECLARE @norm  TABLE (v nvarchar(256), L int);
+  DECLARE @inval TABLE (v nvarchar(256), L int);
 
-  -- Exemplo de até 20 inválidos por coluna
+  INSERT INTO @norm(v, L)
+  SELECT TRY_CONVERT(nvarchar(256), ' + QUOTENAME(@Col) + N'),
+         LEN(TRY_CONVERT(nvarchar(256), ' + QUOTENAME(@Col) + N'))
+  FROM ' + QUOTENAME(@Schema) + N'.' + QUOTENAME(@Table) + N';
+
+  INSERT INTO @inval(v, L)
+  SELECT v, L
+  FROM @norm
+  WHERE v IS NULL
+     OR L <> 14
+     OR v COLLATE SQL_Latin1_General_CP1_CI_AS LIKE ''%[^0-9A-Z]%''; 
+
+  INSERT INTO #summary (SchemaName, TableName, ColumnName, DataType, Total, Distintos, MinLen, MaxLen, QtdInvalidos, QtdInvalidosFormatoNovo)
+  SELECT ' + QUOTENAME(@Schema,'''') + N',
+         ' + QUOTENAME(@Table,'''')  + N',
+         ' + QUOTENAME(@Col,'''')    + N',
+         ' + QUOTENAME(@Type,'''')   + N',
+         (SELECT COUNT(*) FROM @norm),
+         (SELECT COUNT(DISTINCT v) FROM @norm),
+         (SELECT MIN(L) FROM @norm),
+         (SELECT MAX(L) FROM @norm),
+         (SELECT COUNT(*) FROM @inval),
+         (SELECT COUNT(*) FROM @norm 
+            WHERE v IS NOT NULL 
+              AND (L <> 14 
+                   OR v COLLATE SQL_Latin1_General_CP1_CI_AS NOT LIKE ''[0-9A-Z][0-9A-Z][0-9A-Z][0-9A-Z][0-9A-Z][0-9A-Z][0-9A-Z][0-9A-Z][0-9A-Z][0-9A-Z][0-9A-Z][0-9A-Z][0-9][0-9]'')
+          );
+
   INSERT INTO #examples (SchemaName, TableName, ColumnName, Valor, Tamanho, Motivo)
   SELECT TOP (20)
-    ' + QUOTENAME(@Schema,'''') + N',
-    ' + QUOTENAME(@Table,'''')  + N',
-    ' + QUOTENAME(@Col,'''')    + N',
-    v,
-    L,
-    CASE
-      WHEN v IS NULL THEN ''Nulo''
-      WHEN L <> 14 THEN ''Tamanho diferente de 14''
-      WHEN v COLLATE SQL_Latin1_General_CP1_CI_AS LIKE ''%[^0-9A-Z]%'' THEN ''Caractere fora de [0-9A-Z]''
-      ELSE ''Outro''
-    END
-  FROM (
-    SELECT DISTINCT v, L
-    FROM inval
-  ) x;
-  ';
-
+         ' + QUOTENAME(@Schema,'''') + N',
+         ' + QUOTENAME(@Table,'''')  + N',
+         ' + QUOTENAME(@Col,'''')    + N',
+         v, L,
+         CASE WHEN v IS NULL THEN ''Nulo''
+              WHEN L <> 14 THEN ''Tamanho diferente de 14''
+              WHEN v COLLATE SQL_Latin1_General_CP1_CI_AS LIKE ''%[^0-9A-Z]%'' THEN ''Caractere fora de [0-9A-Z]''
+              WHEN v COLLATE SQL_Latin1_General_CP1_CI_AS NOT LIKE ''[0-9A-Z][0-9A-Z][0-9A-Z][0-9A-Z][0-9A-Z][0-9A-Z][0-9A-Z][0-9A-Z][0-9A-Z][0-9A-Z][0-9A-Z][0-9A-Z][0-9][0-9]'' THEN ''Não segue formato novo''
+              ELSE ''Outro'' END
+  FROM (SELECT DISTINCT v, L FROM @norm) x
+  WHERE v IS NULL
+     OR L <> 14
+     OR v COLLATE SQL_Latin1_General_CP1_CI_AS LIKE ''%[^0-9A-Z]%''
+     OR v COLLATE SQL_Latin1_General_CP1_CI_AS NOT LIKE ''[0-9A-Z][0-9A-Z][0-9A-Z][0-9A-Z][0-9A-Z][0-9A-Z][0-9A-Z][0-9A-Z][0-9A-Z][0-9A-Z][0-9A-Z][0-9A-Z][0-9][0-9]'';';
+  
   EXEC sys.sp_executesql @sql;
 
   FETCH NEXT FROM cur INTO @Schema, @Table, @Col, @Type;
 END
-CLOSE cur;
-DEALLOCATE cur;
+CLOSE cur; DEALLOCATE cur;
 
--- 4) Resultados
-
--- Resumo por coluna
-SELECT *
-FROM #summary
+-- Resumo
+SELECT * FROM #summary
 ORDER BY SchemaName, TableName, ColumnName;
 
--- Amostras inválidas (se houver)
-SELECT *
-FROM #examples
+-- Exemplos inválidos
+SELECT * FROM #examples
 ORDER BY SchemaName, TableName, ColumnName, Motivo;
