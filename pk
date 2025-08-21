@@ -1,0 +1,37 @@
+DECLARE @targets TABLE (SchemaName sysname, TableName sysname, ColumnName sysname);
+INSERT INTO @targets VALUES 
+('MOBIOS_CCRP','TB_SB_CREDITO','CNPJ'),
+('MOBIOS_CCRP','TB_SB_LOGS','CNPJ');
+
+SELECT 
+  fk.name                               AS ForeignKey,
+  schRef.name                           AS RefSchema,
+  tRef.name                             AS RefTable,
+  cRef.name                             AS RefColumn,
+  schFrom.name                          AS FromSchema,
+  tFrom.name                            AS FromTable,
+  cFrom.name                            AS FromColumn,
+  fk.delete_referential_action_desc     AS OnDelete,
+  fk.update_referential_action_desc     AS OnUpdate
+FROM sys.foreign_keys fk
+JOIN sys.foreign_key_columns fkc
+  ON fk.object_id = fkc.constraint_object_id
+JOIN sys.tables tRef
+  ON tRef.object_id = fkc.referenced_object_id
+JOIN sys.schemas schRef
+  ON schRef.schema_id = tRef.schema_id
+JOIN sys.columns cRef
+  ON cRef.object_id = tRef.object_id 
+ AND cRef.column_id  = fkc.referenced_column_id
+JOIN sys.tables tFrom
+  ON tFrom.object_id = fkc.parent_object_id
+JOIN sys.schemas schFrom
+  ON schFrom.schema_id = tFrom.schema_id
+JOIN sys.columns cFrom
+  ON cFrom.object_id = tFrom.object_id 
+ AND cFrom.column_id  = fkc.parent_column_id
+JOIN @targets tg
+  ON tg.SchemaName = schRef.name
+ AND tg.TableName  = tRef.name
+ AND tg.ColumnName = cRef.name
+ORDER BY RefSchema, RefTable, ForeignKey, FromSchema, FromTable;
