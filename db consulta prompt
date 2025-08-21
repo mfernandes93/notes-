@@ -1,0 +1,18 @@
+1. Colunas suspeitas de CNPJ
+Preciso que você gere uma consulta SQL Server que liste todas as tabelas e colunas que possuam no nome “cnpj”, “cgc” ou “inscricaofederal”. 
+Quero também o tipo de dado, tamanho e se aceita nulo. 
+O resultado deve vir em forma de tabela organizada.
+
+2. Constraints e índices que usam CNPJ
+Crie uma consulta SQL Server que traga todas as constraints (PK, FK, Unique e Check) e índices que envolvem colunas com nome “cnpj”, “cgc” ou “inscricaofederal”. 
+Retorne nome da constraint, tipo, tabela e coluna associada.
+
+3. Procedures, Views e Functions que usam CNPJ
+Monte uma query SQL Server que busque em sys.sql_modules todos os objetos (procedures, views, functions) que contenham referências a colunas de CNPJ, 
+ou textos como “cnpj”, “cgc”, “inscricaofederal” ou validações de 14 dígitos. 
+Liste schema, nome do objeto e o trecho de código encontrado.
+
+4. Amostragem de dados não numéricos
+Crie uma consulta SQL Server que me permita verificar, em qualquer tabela e coluna que eu indicar manualmente, 
+alguns valores de CNPJ que contenham caracteres não numéricos. 
+A query deve usar ISNUMERIC e trazer os primeiros 50 registros inválidos.
