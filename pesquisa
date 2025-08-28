@@ -2,6 +2,9 @@ Exemplos de buscas no VS2022
 
 Termos gerais
 
+*.cs;*.config;*.json
+
+
 cnpj|cgc|inscricaofederal|cpf_cnpj|cgccpf
 
 
