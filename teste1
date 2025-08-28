@@ -1,0 +1,1 @@
+=SE(ESQUERDA(ARRANCAR(B2);2)="//";"Não";SE(ÉNÚM(PROCURAR("/*";B2));"Não";"Sim"))
