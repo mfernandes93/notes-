@@ -1,15 +1,4 @@
-Passo 2 — preparar busca de padrões de CNPJ
-
-No VS Code pressione Ctrl+Shift+F (ou clique na lupa da barra lateral).
-
-No campo de busca, clique no ícone .* (regex) para ativar expressões regulares.
-
-Em “files to include” cole:
-
-**/*.cs, **/*.config, **/*.json
-
-
-Agora rode as buscas principais (uma de cada vez):
+Exemplos de buscas no VS2022
 
 Termos gerais
 
@@ -36,7 +25,7 @@ Conversões numéricas
 long\.Parse|Convert\.ToInt64|decimal\.Parse|TryParse\(
 
 
-DV / módulo 11
+DV/módulo 11
 
 ValidaCnpj|Modulo11|peso|somatorio
 
