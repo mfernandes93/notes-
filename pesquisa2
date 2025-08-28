@@ -1,0 +1,35 @@
+🔍 Rodada 1 – Termos gerais (abrangência)
+(cnpj|cgc|inscricaofederal|cpf_cnpj|cgccpf)
+
+
+👉 Serve pra achar todos os pontos onde aparece CNPJ ou variações.
+
+🔍 Rodada 2 – Regex e validações de tamanho
+(\b\d{14}\b|@"^\d{14}$"|minLength\s*[:=]\s*14|maxLength\s*[:=]\s*14)
+
+
+👉 Pega regex fixa, checagens de tamanho 14.
+
+🔍 Rodada 3 – Conversões numéricas
+(long\.Parse|Convert\.ToInt64|decimal\.Parse|TryParse\()
+
+
+👉 Pega lugares onde tratam CNPJ como número.
+
+🔍 Rodada 4 – Máscara em UI (WinForms/WPF)
+(MaskedTextBox|Mask\s*=\s*"00\.000\.000/0000-00"|KeyPress)
+
+
+👉 Pega uso de máscara rígida de CNPJ e bloqueio de letras.
+
+🔍 Rodada 5 – Sanitização (remoção de caracteres)
+(Regex\.Replace\(.*?\\D|OnlyDigits|SomenteNumeros|RemoverCaracteresEspeciais)
+
+
+👉 Pega lugares onde limpam tudo que não é dígito (quebraria alfanumérico).
+
+🔍 Rodada 6 – Validação DV
+(ValidaCnpj|Modulo11|peso|somatorio)
+
+
+👉 Pega cálculos de dígito verificador.
