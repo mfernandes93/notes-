@@ -1,0 +1,104 @@
+Quero analisar o impacto de CNPJ no meu código a partir do texto cru da janela “Find Results” do Visual Studio 2022.
+Abaixo vai o INPUT com as linhas retornadas pela busca (cnpj|cgc|inscricaofederal|cpf_cnpj|cgccpf).
+
+O que você deve fazer
+
+Parse do texto:
+
+Cada linha vem no formato:
+C:\caminho\para\arquivo.cs(42): <trecho da linha...>
+
+Extraia:
+
+Arquivo (caminho completo)
+
+Linha (número)
+
+Codigo (trecho)
+
+Deduplicar por (Arquivo,Linha).
+
+Ativo? (Sim/Não):
+
+Não se a linha for comentário:
+
+começa (desconsiderando espaços) com //, ou
+
+contém /* (comentário de bloco na mesma linha)
+
+Caso contrário: Sim.
+
+Classificar cada linha Ativo=Sim em uma das categorias (primeira regra que bater, na ordem):
+
+Regex/14 dígitos: ocorre \d{14}, @"^\d{14}$", Length == 14, minLength=14, maxLength=14
+
+Conversão numérica: ocorre long.Parse, Convert.ToInt64, decimal.Parse, TryParse(
+
+Máscara UI: ocorre MaskedTextBox, Mask = "00.000.000/0000-00", KeyPress
+
+Sanitização: ocorre Regex.Replace(..., "\D"), SomenteNumeros, RemoverCaracteresEspeciais
+
+Validação DV: ocorre ValidaCnpj, Modulo11, peso, somatorio
+
+Contrato/Schema: propriedades/campos/DTOs/assinaturas públicas com Cnpj/variações
+
+Outro: qualquer outro caso
+
+Prioridade:
+
+Alta: Regex/14 dígitos; Conversão numérica; Validação DV (somente se Ativo=Sim)
+
+Média: Máscara UI; Sanitização; Contrato/Schema (Ativo=Sim)
+
+Baixa: Outro ou Ativo=Não
+
+Saídas obrigatórias:
+
+Tabela bruta (CSV e Markdown) com colunas:
+Arquivo, Linha, Codigo, Ativo, Categoria, Prioridade
+
+Resumo por arquivo (CSV e Markdown):
+Arquivo | Regex/14 | Conversão | Máscara UI | Sanitização | Validação DV | Contrato/Schema | Outro | Total (Ativo=Sim)
+Ordene por Total (Ativo=Sim) desc.
+
+Top 10 arquivos críticos (Markdown):
+ordenar por soma de Alta; para cada arquivo, mostrar contagem por categoria e ação recomendada.
+
+Plano de ações (Markdown), por categoria:
+
+Regex/14 dígitos → trocar por ^[A-Z0-9]{12}\d{2}$
+
+Conversão numérica → remover Parse/ToInt64/TryParse; manter string + validação
+
+Máscara UI → remover máscara rígida; MaxLength=14, CharacterCasing=Upper, validação em Validating
+
+Sanitização → não remover letras; se aceitar máscara antiga na entrada, remover só . / - quando valor for totalmente numérico (retrocompat)
+
+Validação DV → manter pesos/módulo 11; converter char com ToVal(c) => c - 48 (’0’..’9’→0..9, ‘A’→17…)
+
+Contrato/Schema → tratar como string (14 chars), armazenar sem máscara e uppercase
+
+Formatos de arquivo a salvar (se possível):
+
+cnpj_scan_bruto.csv
+
+cnpj_resumo_por_arquivo.csv
+
+cnpj_top10.md
+
+cnpj_plano.md
+
+Critérios de aceite:
+
+Sem duplicados por (Arquivo,Linha)
+
+Coluna Ativo corretamente definida
+
+100% das linhas Ativo=Sim classificadas em alguma categoria
+
+Top 10 ordenado por Alta
+
+Plano com exemplos de alteração por categoria (antes/depois)
+
+INPUT (cole aqui exatamente o texto da janela “Find Results” do VS)
+<COLE AQUI O RESULTADO CRU DA BUSCA DO VISUAL STUDIO>
