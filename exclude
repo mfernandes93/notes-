@@ -1,0 +1,12 @@
+{
+  "search.exclude": {
+    "**/bin/**": true,
+    "**/obj/**": true,
+    "**/.git/**": true,
+    "**/packages/**": true
+  },
+  "files.exclude": {
+    "**/bin/**": true,
+    "**/obj/**": true
+  }
+}
