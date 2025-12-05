@@ -1,0 +1,28 @@
+Para um refinamento, o objetivo muda um pouco: além de dizer o que fazer, você quer destacar a complexidade e os riscos para ajudar o time a pontuar/estimar a tarefa corretamente.
+
+Aqui está uma versão otimizada para guiar a discussão técnica no refinamento:
+
+Título: Adequação Técnica para CNPJ Alfanumérico
+Objetivo: Refatorar a aplicação para suportar CNPJs contendo letras e números (formato String), abandonando a tipagem numérica (Long/Decimal).
+
+Escopo Técnico:
+
+Banco de Dados: Migração de colunas de CNPJ para VARCHAR(14) (necessário script de migração/conversão).
+
+Backend: Alteração de tipagem em Entidades, DTOs e Contratos (Swagger).
+
+Lógica de Negócio:
+
+Remover validações numéricas antigas.
+
+Implementar normalização (Upper Case + Remoção de caracteres especiais).
+
+Integrações: Ajustar serialização JSON e inputs de robôs/APIs externas.
+
+Pontos de Atenção (Riscos):
+
+Impacto em dados legados e relatórios.
+
+Necessidade de Feature Flag para deploy seguro?
+
+Quebra de contratos com consumidores da nossa API.
