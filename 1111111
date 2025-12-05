@@ -1,0 +1,79 @@
+Com base na sua solicitação e nos documentos analisados, aqui está a **Documentação Unificada do Projeto de Migração CNPJ Alfanumérico**, ajustada para a premissa de que a responsabilidade por adaptações externas recai sobre os parceiros/consumidores.
+
+---
+
+# 📘 Projeto de Implementação: CNPJ Alfanumérico (Mobius CCRP)
+
+## 1. Visão Geral e O Desafio
+[cite_start]A partir de 2026, o padrão de CNPJ brasileiro mudará de exclusivamente numérico (apenas dígitos) para alfanumérico (letras e números)[cite: 3].
+[cite_start]O ecossistema atual do Mobius CCRP foi construído sob a premissa rígida de que o identificador "CNPJ" contém apenas números[cite: 4].
+[cite_start]**O Problema:** Se o sistema receber um código com letras hoje (ex: "12.ABC..."), ele tentará realizar cálculos matemáticos ou formatações numéricas, causando erros fatais ("Crash") na aplicação[cite: 5, 13].
+
+[cite_start]**O Objetivo:** Realizar uma mudança de paradigma, ensinando o sistema a tratar o CNPJ estritamente como **Texto (String)**, garantindo que ele aceite o novo formato sem travar e mantenha o funcionamento dos contratos atuais[cite: 23, 6].
+
+---
+
+## 2. Estratégia de Fases
+
+O projeto será executado em 4 fases lógicas para garantir a segurança da operação.
+
+### **Fase 1: Infraestrutura de Dados (Blindagem)**
+* **Foco:** Banco de Dados e Histórico.
+* **O que será feito:** O banco de dados precisa saber diferenciar e buscar letras sem causar duplicidade (ex: garantir que "abc" e "ABC" sejam o mesmo cliente). [cite_start]Criaremos uma estrutura "espelho" normalizada para buscas e adaptaremos o histórico existente[cite: 17, 21].
+* **Complexidade:** Alta (envolve manipulação de massa de dados).
+
+### **Fase 2: Refatoração do Core (Segurança e Anti-Crash)**
+* **Foco:** O "Cérebro" do Sistema (Backend Mobius).
+* **O que será feito:** É a fase mais crítica. Envolve "operar" o coração do sistema para remover qualquer lógica que trate CNPJ como número (matemática). [cite_start]Substituiremos as regras de validação (Dígito Verificador) e de formatação (máscaras de pontos e traços) por versões que aceitem texto[cite: 44, 46].
+* **Complexidade:** Crítica (risco de parar a operação se houver erro).
+
+### **Fase 3: Fronteiras e Contratos (Publicação)**
+* **Foco:** APIs e Comunicação Externa.
+* **O que será feito:** Atualizar as "portas de entrada e saída" (APIs, Swagger, Mensageria). Definiremos explicitamente nos contratos técnicos que o campo agora aceita letras.
+* **Responsabilidade:** Garantir que o Mobius aceite receber e saiba enviar o dado novo. [cite_start]Se o sistema vizinho (parceiro/consumidor) não estiver pronto para ler esse dado, o erro será tratado do lado dele[cite: 33, 78].
+* **Complexidade:** Média (ajuste de contratos e validações de entrada).
+
+### **Fase 4: Estabilização (Qualidade)**
+* **Foco:** Performance e Garantia.
+* [cite_start]**O que será feito:** Testes de carga para garantir que a troca de índices numéricos por textuais não deixou o sistema lento, e monitoramento para assegurar que a operação segue fluida[cite: 53, 55].
+* **Complexidade:** Média.
+
+---
+
+## 3. Backlog Detalhado por Componente
+
+Abaixo, o detalhamento do trabalho técnico necessário, classificado por componente e complexidade.
+
+### 🗄️ Componente: Banco de Dados (SQL Server)
+
+| Item de Trabalho | Complexidade | Por que fazer isso? |
+| :--- | :--- | :--- |
+| **Criar Coluna Normalizada (`DOCUMENTO_NORM`)** | 🔴 Alta | [cite_start]O banco precisa de um local dedicado para salvar o CNPJ "limpo" (sem pontos, tudo maiúsculo) para garantir buscas rápidas e unicidade[cite: 19, 20]. |
+| **Rodar Script de Carga (Backfill)** | 🔴 Alta | [cite_start]É necessário preencher essa nova coluna para todo o histórico de clientes (milhões de registros), permitindo que o sistema busque antigos e novos da mesma forma[cite: 42, 62]. |
+| **Remover Filtros Numéricos (`ISNUMERIC`)** | 🟡 Média | Existem scripts no banco que rejeitam dados que não são números. [cite_start]Precisamos remover essas travas para permitir a gravação dos alfanuméricos[cite: 65]. |
+
+### 🧠 Componente: Backend (Mobius Core / Aplicação)
+
+| Item de Trabalho | Complexidade | Por que fazer isso? |
+| :--- | :--- | :--- |
+| **Refatorar Validador Mestre (`TestaCPFCNPJ`)** | 🔴 Crítica | Este é o método que diz se um cadastro é válido. [cite_start]Ele deve ser reescrito para: se for numérico, valida a conta antiga; se for alfanumérico, valida apenas se tem 14 caracteres[cite: 68, 69]. |
+| **Remover Conversão Decimal (`Anti-Crash`)** | 🔴 Crítica | Hoje o sistema converte o CNPJ em valor decimal para colocar pontos. Com letras, isso gera um erro fatal (`Crash`). [cite_start]A lógica deve mudar para manipulação de texto apenas[cite: 13, 71]. |
+| **Atualizar Entidades de Domínio** | 🟠 Alta | [cite_start]Revisão de mais de 30 arquivos de classes (Modelos) para garantir que a propriedade "CNPJ" seja tratada como Texto e normalizada (Maiúsculas) ao ser criada[cite: 10, 74]. |
+| **Ajustar Formatação de E-mails** | 🟡 Média | Os e-mails enviados pelo sistema formatam o CNPJ antes do disparo. [cite_start]Essa formatação precisa aceitar letras para não travar o envio de notificações[cite: 752, 892]. |
+
+### 🌐 Componente: Interfaces e API (BFF - Onboarding)
+
+*Contexto Fase 3: Garantia do nosso contrato.*
+
+| Item de Trabalho | Complexidade | Por que fazer isso? |
+| :--- | :--- | :--- |
+| **Ajustar Contratos de Entrada (DTOs)** | 🟡 Média | As APIs (BFF) hoje bloqueiam requisições que contêm letras. [cite_start]Precisamos alterar a validação de entrada para aceitar string de 14 caracteres, permitindo que o dado chegue ao backend[cite: 79]. |
+| **Atualizar Documentação (Swagger/Schemas)** | 🟢 Baixa | Atualizar o manual técnico da API e os esquemas de mensagens (Kafka/Avro) para explicitar que o campo é `String`. [cite_start]Isso oficializa a mudança para quem consome nossos dados[cite: 33, 84]. |
+| **Remover Máscaras de Resposta** | 🟡 Média | [cite_start]Ao devolver dados para o Frontend ou parceiros, garantir que o JSON de resposta envie o dado sem tentar aplicar a máscara numérica antiga[cite: 113, 115]. |
+
+### 🤖 Componente: Robôs (RPA/Automação)
+
+| Item de Trabalho | Complexidade | Por que fazer isso? |
+| :--- | :--- | :--- |
+| **Input de Texto Puro** | 🟡 Média | [cite_start]Alterar o robô para "colar" o texto do CNPJ diretamente nos sites externos, removendo qualquer tentativa do robô de formatar ou validar matematicamente antes de digitar[cite: 89, 90]. |
+| **Captura de Erros Web** | 🟢 Baixa | [cite_start]Preparar o robô para ler mensagens de erro na tela do site externo (ex: "Formato Inválido"), para diferenciar falha do robô de rejeição do site[cite: 91]. |
