@@ -1,0 +1,145 @@
+Objetivo:
+Analisar exclusivamente o código disponibilizado na Knowledge Base deste projeto e identificar SOMENTE os métodos que precisam ser alterados para que o sistema passe a aceitar CNPJ alfanumérico, conforme regras oficiais da Receita Federal para o novo CNPJ.
+
+Contexto funcional obrigatório:
+Considere as seguintes regras de negócio e compatibilidade:
+
+1. O novo CNPJ continua com 14 posições totais.
+2. As 12 primeiras posições podem ser alfanuméricas:
+   - caracteres permitidos: 0-9 e letras maiúsculas A-Z
+3. As 2 últimas posições continuam sendo dígitos verificadores numéricos.
+4. O cálculo do dígito verificador continua usando módulo 11.
+5. Para cálculo do DV no formato alfanumérico, os caracteres devem ser convertidos com base no código ASCII menos 48.
+   Exemplos:
+   - '0' = 48 -> 0
+   - '9' = 57 -> 9
+   - 'A' = 65 -> 17
+   - 'B' = 66 -> 18
+   - ...
+   - 'Z' = 90 -> 42
+6. Os CNPJs atuais somente numéricos continuam válidos e devem continuar sendo aceitos sem regressão.
+7. O sistema deve continuar aceitando:
+   - CNPJ com máscara
+   - CNPJ sem máscara
+8. Devem ser considerados pontos de impacto como:
+   - validação
+   - regex
+   - sanitização / normalização
+   - parsing
+   - DTOs
+   - entities
+   - models
+   - viewmodels
+   - requests/responses
+   - annotations
+   - máscaras de tela
+   - formatação
+   - persistência em banco
+   - stored procedures
+   - queries SQL
+   - filtros de busca
+   - integrações
+   - comparações
+   - tamanho de campo
+   - conversões string/número
+   - ordenação e indexação onde houver dependência do formato atual
+9. Não assuma nada fora do código disponível na Knowledge Base.
+
+Tarefa:
+Faça uma varredura completa no código e identifique apenas os métodos, funções, procedures, triggers, views, classes ou pontos exatos que precisam de alteração para suportar CNPJ alfanumérico sem quebrar compatibilidade com CNPJ numérico já existente.
+
+Critérios de análise:
+- Procure qualquer lógica que:
+  - valide CNPJ
+  - remova caracteres
+  - exija somente dígitos
+  - use regex numérica
+  - converta CNPJ para int/long/decimal
+  - compare comprimento fixo assumindo somente números
+  - monte ou valide DV
+  - formate com máscara
+  - use substring posicional
+  - grave em campos inadequados
+  - consulte por CNPJ
+  - utilize tipos numéricos em vez de string
+  - aplique regras de CPF/CNPJ compartilhadas
+  - use helpers utilitários centrais reutilizados por vários fluxos
+
+Formato da resposta:
+IMPORTANTE: nesta primeira resposta, retorne SOMENTE uma lista objetiva dos itens que precisam ser alterados.
+NÃO explique a correção ainda.
+NÃO escreva pseudocódigo.
+NÃO proponha implementação.
+NÃO resuma regras.
+NÃO descreva impacto.
+NÃO agrupe genericamente como "classe X" sem apontar o método quando isso for possível.
+
+Quero a saída exatamente neste formato:
+
+[ARQUIVO]
+- [Tipo: Método/Função/Procedure/View/Trigger/Classe/Regex/Campo]
+- [Nome exato]
+- [Motivo resumido em no máximo 8 palavras]
+
+Exemplo de formato:
+[ClienteService.cs]
+- [Tipo: Método]
+- [Nome: ValidarCnpj]
+- [Motivo: aceita apenas dígitos]
+
+Se houver SQL:
+[SP_VALIDAR_CLIENTE.sql]
+- [Tipo: Procedure]
+- [Nome: SP_VALIDAR_CLIENTE]
+- [Motivo: valida CNPJ como numérico]
+
+Se houver trechos sem método nomeado:
+[ArquivoX.cs]
+- [Tipo: Trecho]
+- [Nome: regex de validação de CNPJ]
+- [Motivo: restringe para formato numérico]
+
+Regra final de resposta:
+- Retorne somente os itens candidatos à alteração.
+- Não explique como alterar.
+- Não invente nomes.
+- Se não tiver certeza absoluta do nome do método, informe o nome da classe/arquivo e identifique o trecho.
+- Priorize exatidão e cobertura.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Agora, com base EXCLUSIVAMENTE na lista de métodos/trechos que você identificou, detalhe o que deve ser alterado em cada item para suportar CNPJ alfanumérico sem quebrar compatibilidade com CNPJ numérico já existente.
+
+Para cada item, informe:
+1. O problema atual
+2. O que deve mudar
+3. Regra de negócio envolvida
+4. Risco de regressão
+5. Dependências impactadas
+6. Exemplo de entrada antiga e nova
+7. Se exige ajuste em banco, SQL, regex, DTO, tela ou integração
+
+Formato:
+[Arquivo]
+[Item]
+- Problema atual:
+- Alteração necessária:
+- Regra:
+- Risco:
+- Dependências:
+- Exemplos:
+- Observações:
+
+Não reanalise arquivos fora da lista já retornada.
+Não gere código ainda.
