@@ -1,0 +1,95 @@
+Objetivo:
+Analisar exclusivamente o código disponibilizado na Knowledge Base deste projeto e identificar SOMENTE os arquivos .cs que contêm lógica que pode precisar ser alterada para suportar CNPJ alfanumérico.
+
+Contexto funcional obrigatório:
+
+Considere as regras oficiais do novo CNPJ alfanumérico:
+
+1. O CNPJ continua com 14 posições.
+2. As 12 primeiras posições podem ser alfanuméricas:
+   - caracteres permitidos: 0-9 e letras maiúsculas A-Z
+3. As 2 últimas posições continuam sendo dígitos verificadores numéricos.
+4. O cálculo do dígito verificador continua módulo 11.
+5. Para cálculo do DV, os caracteres devem ser convertidos por ASCII - 48.
+6. CNPJs atuais somente numéricos continuam válidos.
+7. O sistema deve aceitar:
+   - CNPJ com máscara
+   - CNPJ sem máscara
+
+Tarefa:
+
+Faça uma varredura completa no código da Knowledge Base e identifique apenas arquivos .cs que possuam lógica potencialmente impactada pela mudança de CNPJ numérico para alfanumérico.
+
+Critérios para identificar impacto:
+
+Procure arquivos que contenham lógica relacionada a:
+
+- validação de CNPJ
+- regex de CNPJ
+- sanitização de CNPJ
+- formatação de CNPJ
+- cálculo de dígito verificador
+- parsing ou substring do CNPJ
+- comparação de CNPJ
+- consultas por CNPJ
+- DTOs ou models que contenham CNPJ
+- utilitários compartilhados de CPF/CNPJ
+- conversões numéricas do CNPJ
+- regras que assumem somente dígitos
+- verificações de tamanho ou caracteres
+- máscaras de exibição
+
+Importante:
+
+NÃO identifique métodos nesta etapa.
+
+NÃO explique alterações.
+
+NÃO proponha soluções.
+
+NÃO descreva regras.
+
+Somente liste arquivos que precisam ser analisados.
+
+Formato da resposta:
+
+Retorne apenas uma lista de arquivos .cs.
+
+Um por linha.
+
+Exemplo de saída:
+
+ClienteService.cs
+CnpjValidator.cs
+DocumentoHelper.cs
+EmpresaRepository.cs
+ClienteController.cs
+PessoaJuridicaDTO.cs
+
+Regra final:
+
+Retorne somente arquivos .cs que possuem lógica potencialmente impactada.
+
+Se houver dúvida sobre um arquivo, inclua ele na lista.
+
+Não escreva nenhum texto adicional antes ou depois da lista.
+
+
+
+
+
+Agora analise SOMENTE os seguintes arquivos:
+
+[cole aqui a lista retornada]
+
+Identifique os métodos específicos que precisam ser alterados para suportar CNPJ alfanumérico.
+
+Formato da resposta:
+
+[Arquivo.cs]
+- NomeDoMetodo
+- NomeDoMetodo2
+- NomeDoMetodo3
+
+Não explique nada ainda.
+Retorne somente os métodos.
