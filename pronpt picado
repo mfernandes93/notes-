@@ -1,0 +1,397 @@
+Prompt principal — etapa 1, retornar só arquivos .cs
+Objetivo:
+Analisar exclusivamente o código C# disponível na Knowledge Base deste projeto e retornar SOMENTE os arquivos .cs que devem ser analisados para adequação ao CNPJ alfanumérico.
+
+Escopo obrigatório:
+- Considere apenas arquivos .cs
+- Ignore SQL, scripts, JSON, XML, config, front-end e documentação nesta etapa
+- Não retornar métodos
+- Não retornar explicações
+- Não retornar sugestões de correção
+- Não resumir regras
+- Não agrupar por pasta sem listar os arquivos
+
+Contexto funcional:
+O sistema hoje aceita CNPJ tradicional numérico e precisa suportar também CNPJ alfanumérico.
+
+Regras a considerar:
+1. O CNPJ continua com 14 posições totais
+2. As 12 primeiras posições podem conter:
+   - números de 0 a 9
+   - letras maiúsculas de A a Z
+3. As 2 últimas posições continuam sendo dígitos verificadores numéricos
+4. O CNPJ numérico atual continua válido e deve continuar funcionando
+5. Devem ser considerados fluxos com:
+   - valor com máscara
+   - valor sem máscara
+6. Toda lógica que assuma “somente números” pode estar impactada
+
+Sua tarefa:
+Faça uma varredura completa e liste SOMENTE os arquivos .cs potencialmente impactados por essa mudança.
+
+Procure arquivos que tenham qualquer uma das seguintes características:
+- validação de CNPJ
+- validação de CPF/CNPJ compartilhada
+- regex com dígitos
+- uso de char.IsDigit
+- uso de IsMatch para documentos
+- sanitização de documento
+- remoção de máscara
+- formatação de CNPJ
+- cálculo de dígito verificador
+- comparação de documento
+- substring posicional em documento
+- Replace de ".", "/", "-"
+- Trim + Length para documento
+- conversão do CNPJ para número
+- int.Parse, long.Parse, Convert.ToInt64, decimal.Parse sobre documento
+- uso de OnlyNumbers, SomenteNumeros, ApenasNumeros, RemoveMascara, LimparDocumento ou similares
+- DTOs, Models, Entities, ViewModels, Requests, Responses com campo CNPJ
+- DataAnnotations, attributes ou validators de documento
+- filtros, pesquisas e buscas por CNPJ
+- services, repositories, controllers ou helpers que manipulem CNPJ
+- classes utilitárias de documento
+- heranças ou interfaces de validadores
+- extensões string relacionadas a documento
+- mapeamentos que imponham tamanho, tipo ou normalização
+- validações de comprimento fixo assumindo apenas dígitos
+- comparações entre CPF e CNPJ usando regra antiga
+- montagem de máscara ##.###.###/####-##
+
+Heurísticas obrigatórias:
+Considere como forte candidato qualquer arquivo .cs que contenha um ou mais destes termos:
+- CNPJ
+- CPFCNPJ
+- CpfCnpj
+- Documento
+- DocumentoFiscal
+- Inscricao
+- PessoaJuridica
+- Empresa
+- Cliente
+- Fornecedor
+- Cedente
+- Sacado
+- Tomador
+- Prestador
+- Beneficiario
+- Emitente
+- Filial
+- Matriz
+- Validator
+- Validation
+- Helper
+- Util
+- Utils
+- Extension
+- Formatter
+- Formatador
+- Normalizer
+- Parser
+- Service
+- Repository
+- DTO
+- Model
+- Entity
+- Request
+- Response
+
+Também marque arquivos que contenham qualquer um destes padrões lógicos:
+- Regex
+- IsMatch
+- Match
+- char.IsDigit
+- Char.IsDigit
+- string.Format
+- Substring
+- Replace
+- Length
+- PadLeft
+- PadRight
+- int.Parse
+- long.Parse
+- Convert.ToInt64
+- decimal.Parse
+- TryParse
+- ToString("00000000000000")
+- somenteNumeros
+- onlyNumbers
+- removeMask
+- removeMascara
+- formataCnpj
+- validarCnpj
+- validaCnpj
+- documento.Length
+- cnpj.Length
+- cpfCnpj.Length
+
+Critério de inclusão:
+Inclua o arquivo se existir qualquer chance razoável de impacto.
+Prefira excesso de cobertura a omissão.
+
+Critério de exclusão:
+Não inclua arquivos .cs que claramente não tenham qualquer relação com documento, validação, cadastro, integração, busca, formatação, parsing ou persistência de CNPJ.
+
+Formato de saída:
+Retorne SOMENTE os nomes dos arquivos .cs.
+Um arquivo por linha.
+Sem bullets.
+Sem numeração.
+Sem comentário.
+Sem cabeçalho.
+Sem rodapé.
+
+Exemplo de formato esperado:
+CnpjValidator.cs
+DocumentoHelper.cs
+ClienteService.cs
+PessoaJuridicaDTO.cs
+EmpresaRepository.cs
+DocumentoExtensions.cs
+
+Regra final:
+A resposta deve conter apenas a lista de arquivos .cs candidatos à análise.
+Nada além disso.
+Versão ainda mais eficiente — varredura por blocos
+
+Se a Knowledge Base for grande, usa em partes. Isso costuma ajudar a não perder arquivo importante.
+
+Bloco 1 — Validators, helpers, utils, extensions
+Analise exclusivamente o código C# da Knowledge Base e retorne SOMENTE os arquivos .cs que devem ser analisados para suportar CNPJ alfanumérico.
+
+Neste passo, procure APENAS arquivos com perfil de:
+- Validator
+- Validation
+- Helper
+- Util
+- Utils
+- Extension
+- Formatter
+- Normalizer
+- Parser
+
+Procure especialmente por arquivos contendo:
+- CNPJ
+- CPFCNPJ
+- Documento
+- Regex
+- IsMatch
+- char.IsDigit
+- Substring
+- Replace
+- Length
+- Parse
+- TryParse
+- RemoveMascara
+- OnlyNumbers
+- validarCnpj
+- validaCnpj
+- formataCnpj
+
+Retorne somente os nomes dos arquivos .cs.
+Um por linha.
+Sem explicação.
+Sem métodos.
+Sem texto adicional.
+Bloco 2 — DTOs, Models, Entities, Requests, Responses
+Analise exclusivamente o código C# da Knowledge Base e retorne SOMENTE os arquivos .cs que devem ser analisados para suportar CNPJ alfanumérico.
+
+Neste passo, procure APENAS arquivos com perfil de:
+- DTO
+- Model
+- Entity
+- ViewModel
+- Request
+- Response
+
+Inclua arquivos que:
+- possuam campo CNPJ
+- possuam campo Documento
+- possuam atributo de validação
+- imponham tamanho, máscara, regex ou normalização
+- representem Pessoa Jurídica, Empresa, Cliente, Fornecedor, Cedente, Sacado, Prestador, Tomador ou Beneficiário
+
+Retorne somente os nomes dos arquivos .cs.
+Um por linha.
+Sem explicação.
+Sem métodos.
+Sem texto adicional.
+Bloco 3 — Services, repositories, controllers
+Analise exclusivamente o código C# da Knowledge Base e retorne SOMENTE os arquivos .cs que devem ser analisados para suportar CNPJ alfanumérico.
+
+Neste passo, procure APENAS arquivos com perfil de:
+- Service
+- Repository
+- Controller
+- Manager
+- Application
+- Facade
+
+Inclua arquivos que:
+- consultem por CNPJ
+- comparem documentos
+- validem entrada
+- montem filtros por documento
+- convertam documento para número
+- normalizem documento antes de salvar
+- formatem documento para retorno
+- usem CPF/CNPJ em regras de negócio
+- usem Pessoa Jurídica, Empresa, Cliente, Fornecedor ou similares
+
+Sinais fortes de impacto:
+- CNPJ
+- Documento
+- Regex
+- Parse
+- Convert.ToInt64
+- long.Parse
+- Length
+- Replace
+- Substring
+- validar
+- formatar
+- normalizar
+- buscar por documento
+
+Retorne somente os nomes dos arquivos .cs.
+Um por linha.
+Sem explicação.
+Sem métodos.
+Sem texto adicional.
+Prompt de refinamento
+
+Depois que ele devolver a lista, usa este para limpar ruído e priorizar:
+
+Revise a lista anterior e mantenha SOMENTE os arquivos .cs com maior probabilidade real de impacto para suportar CNPJ alfanumérico.
+
+Regras:
+- Remova arquivos claramente sem manipulação de CNPJ, documento, validação, parsing, formatação, busca ou persistência
+- Mantenha arquivos com chance razoável de conter regra antiga baseada em somente dígitos
+- Priorize arquivos centrais e reutilizados
+- Se um arquivo apenas consome um campo string sem regra alguma, exclua
+
+Formato:
+Retorne somente os nomes dos arquivos .cs finais.
+Um por linha.
+Sem explicação.
+Sem texto adicional.
+Prompt da etapa 2 — agora sim pegar métodos só dos arquivos retornados
+Agora analise SOMENTE os arquivos abaixo e identifique SOMENTE os métodos, propriedades, trechos nomeados ou validações que precisam ser alterados para suportar CNPJ alfanumérico:
+
+[COLE A LISTA DE ARQUIVOS AQUI]
+
+Regras:
+- Não analisar nenhum arquivo fora da lista
+- Não explicar como corrigir
+- Não gerar código
+- Não resumir regra de negócio
+
+Procure especificamente por:
+- validação de CNPJ
+- regex
+- char.IsDigit
+- Replace para máscara
+- Substring
+- Length
+- Parse / TryParse / Convert
+- comparação de documento
+- normalização
+- formatação
+- cálculo de dígito verificador
+- DataAnnotations
+- attributes customizados
+- helper methods reutilizados
+- mapeamentos ou propriedades que imponham regra antiga
+
+Formato de saída:
+[Arquivo.cs]
+- [Tipo: Método/Propriedade/Trecho/Regex/Attribute]
+- [Nome exato]
+- [Motivo em até 8 palavras]
+
+Exemplo:
+[DocumentoHelper.cs]
+- [Tipo: Método]
+- [Nome: SomenteNumeros]
+- [Motivo: remove letras do novo CNPJ]
+
+Retorne somente isso.
+Sem texto adicional.
+Prompt da etapa 3 — detalhar o que mudar
+
+Quando tiver os métodos:
+
+Agora detalhe SOMENTE o que deve ser ajustado nos itens abaixo para suportar CNPJ alfanumérico sem quebrar CNPJ numérico existente:
+
+[COLE A RESPOSTA DA ETAPA 2]
+
+Para cada item, informe:
+- problema atual
+- por que quebra com CNPJ alfanumérico
+- ajuste necessário
+- risco de regressão
+- dependências impactadas
+- se precisa revisar regex, parse, length, máscara ou DV
+
+Não gerar código ainda.
+Não reanalisar arquivos fora da lista.
+Comandos/palavras que mais ajudam a “caçar” os pontos
+
+Na prática, quando você quiser apertar a busca, inclua termos como estes no prompt:
+
+Procure especialmente por:
+CNPJ
+CpfCnpj
+CPFCNPJ
+Documento
+DocumentoFiscal
+PessoaJuridica
+Empresa
+Fornecedor
+Cliente
+Cedente
+Sacado
+Tomador
+Prestador
+Beneficiario
+Emitente
+Filial
+Matriz
+Regex
+IsMatch
+char.IsDigit
+Substring
+Replace
+Length
+Parse
+TryParse
+Convert.ToInt64
+OnlyNumbers
+SomenteNumeros
+RemoveMascara
+FormatarCnpj
+ValidarCnpj
+ValidaCnpj
+DocumentoHelper
+DocumentoExtensions
+Validator
+ValidationAttribute
+Estratégia prática para teu caso
+
+Ordem que eu usaria no StackSpot:
+
+rodar o prompt principal ou por blocos
+
+pegar a lista de .cs
+
+rodar o refinamento
+
+rodar a etapa de métodos só nos arquivos finais
+
+rodar o detalhamento das mudanças
+
+só depois pedir geração de código
+
+Isso evita gastar resposta logo de cara com método errado ou arquivo irrelevante.
+
+Se você quiser, eu monto agora uma versão ultra focada em C# legado corporativo, mirando nomes muito comuns tipo Utils, Commons, Extensions, PessoaJuridica, DocumentoHelper, BaseValidator, ClienteBO, EmpresaService, Cadastro*, Beneficiario*, Cedente*, que costuma achar ainda mais coisa em projeto grande.
